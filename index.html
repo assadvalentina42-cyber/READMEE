@@ -4,6 +4,78 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Planet Jumping</title>
+<script>
+/* ==========================================================================
+   TEMPLATE CONFIG — the only block you need to edit to reuse this page.
+   Every image/video path and every zoom focus point lives here.
+   How-to: README.md → "Reusing the portal template".
+   ========================================================================== */
+const MEDIA = 'https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P';
+
+const TEMPLATE = {
+  logo: { src: `${MEDIA}/eb7e0f53-50cd-4af5-abc4-8b9a52cdc01b.svg`, alt: 'Ubernatural' },
+
+  // Sidebar labels. The entry matching the current scene's `name` is highlighted.
+  menu: ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'],
+
+  // Scenes in travel order. The first one is where the page starts.
+  //   arrival    video that plays while zooming INTO this scene (scene 1: the preloader)
+  //   image      still used when there is no `arrival` video (portal preview + zoom target)
+  //   background optional looping video kept behind the page while on this scene
+  //   focus      zoom/crop anchor in % of the media: {x:0,y:0} = top-left, {x:50,y:50} = centre
+  //   zoom       how far the zoom pushes into `focus` on arrival (1 = none)
+  //   locked     shown in the portal as a preview, but cannot be entered
+  //   notes      transition notes for whoever edits this; not shown on the page
+  scenes: [
+    {
+      id: 'mars', name: 'Mars', label: '[04]',
+      arrival: `${MEDIA}/5fc5651c-3b5d-4171-b507-87f7e635d1b4.mp4`,
+      background: `${MEDIA}/3c83091e-4046-4fd6-adbb-2edb728be79a.mp4`,
+      focus: { x: 50, y: 50 }, zoom: 1,
+      notes: 'Intro: arrival video doubles as the ~3 s preloader; its last frame stays as the backdrop.',
+      facts: [
+        ['Distance:', 'About 228 million km (1.5 astronomical units).'],
+        ['Year:', 'One Martian year is equal to 687 Earth days.'],
+        ['Temperature:', 'Around -60 °C, dropping to -125 °C at the poles in winter.'],
+        ['Atmosphere:', 'Very thin, consisting of 95% carbon dioxide, with frequent dust storms.']
+      ]
+    },
+    {
+      id: 'earth', name: 'Earth', label: '[03]',
+      arrival: `${MEDIA}/fc3ded42-e845-41f3-a830-5cab512d79cd.mp4`,
+      background: `${MEDIA}/fc3ded42-e845-41f3-a830-5cab512d79cd.mp4`,
+      focus: { x: 50, y: 50 }, zoom: 1.12,
+      notes: 'Mars → Earth: window grows to full screen while pushing into the centre; video plays at 1.3×.',
+      facts: [
+        ['Distance:', '149.6 million km from the Sun.'],
+        ['Year:', '365.25 Earth days.'],
+        ['Temperature:', 'Average surface temperature around 15 °C.'],
+        ['Atmosphere:', 'Mostly nitrogen and oxygen, supporting life and liquid water.']
+      ]
+    },
+    {
+      id: 'venus', name: 'Venus', label: '[02]',
+      arrival: `${MEDIA}/b30f64d9-1637-477a-83df-d0fc6461a422.mp4`,
+      background: `${MEDIA}/b30f64d9-1637-477a-83df-d0fc6461a422.mp4`,
+      focus: { x: 50, y: 50 }, zoom: 1.12,
+      notes: 'Earth → Venus: same push-in; last frame of the video is held as the Venus backdrop.',
+      facts: [
+        ['Distance:', '108.2 million km from the Sun.'],
+        ['Year:', '225 Earth days.'],
+        ['Temperature:', 'Around 465 °C — the hottest planet in the Solar System.'],
+        ['Atmosphere:', 'Extremely dense, mostly carbon dioxide, with clouds of sulfuric acid.']
+      ]
+    },
+    {
+      id: 'mercury', name: 'Mercury', label: '[06]',
+      image: `${MEDIA}/d6fb8b6b-c15e-4aaa-9cf7-45bbb5e33372.jpg`,
+      focus: { x: 50, y: 50 }, zoom: 1.12, locked: true,
+      notes: 'Teaser only: shown in the Venus portal, clicking does nothing. Remove `locked` to make it enterable.',
+      facts: []
+    }
+  ]
+};
+</script>
 <style>
 @font-face{font-family:'SF Pro';font-weight:400;font-style:normal;font-display:swap;
   src:local('SF Pro Text'),local('SF Pro Display'),local('SFProText-Regular'),url('fonts/SF-Pro-Regular.woff2') format('woff2')}
@@ -148,17 +220,13 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
 </head>
 <body>
 <main class="experience" data-planet="mars">
-  <div class="backgrounds" aria-hidden="true">
-    <video id="mars-background" class="background is-visible" src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/3c83091e-4046-4fd6-adbb-2edb728be79a.mp4" muted playsinline preload="auto"></video>
-    <video id="earth-background" class="background" src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/fc3ded42-e845-41f3-a830-5cab512d79cd.mp4" muted playsinline preload="auto"></video>
-    <video id="venus-background" class="background" src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/b30f64d9-1637-477a-83df-d0fc6461a422.mp4" muted playsinline preload="auto"></video>
-  </div>
+  <div class="backgrounds" aria-hidden="true"></div>
 
-  <div class="preloader" id="preloader" aria-label="Loading Mars">
-    <video id="preloader-video" src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/5fc5651c-3b5d-4171-b507-87f7e635d1b4.mp4" muted playsinline preload="auto"></video>
+  <div class="preloader" id="preloader" aria-label="Loading">
+    <video id="preloader-video" muted playsinline preload="auto"></video>
     <div class="preloader-shade"></div>
   </div>
-  <img class="floating-logo" id="floating-logo" src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/eb7e0f53-50cd-4af5-abc4-8b9a52cdc01b.svg" alt="Ubernatural">
+  <img class="floating-logo" id="floating-logo" alt="">
   <div class="preloader-count" id="preloader-count" aria-live="polite">
     <span id="preloader-value">0</span><span class="percent">%</span>
   </div>
@@ -181,16 +249,16 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
   <section class="portal-wrap chrome" aria-label="Next destination">
     <div class="portal-heading">
       <span>Next:</span>
-      <span><span id="next-number">[03]</span> <strong id="next-name">Earth</strong></span>
+      <span><span id="next-number"></span> <strong id="next-name"></strong></span>
     </div>
-    <button class="portal" id="portal" type="button" aria-label="Travel to Earth">
-      <video id="portal-video" src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/fc3ded42-e845-41f3-a830-5cab512d79cd.mp4" muted playsinline preload="auto"></video>
-      <img id="portal-image" src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/d6fb8b6b-c15e-4aaa-9cf7-45bbb5e33372.jpg" alt="Mercury">
+    <button class="portal" id="portal" type="button" aria-label="Travel">
+      <video id="portal-video" muted playsinline preload="auto"></video>
+      <img id="portal-image" alt="">
     </button>
   </section>
 
   <section class="planet-content chrome" aria-live="polite">
-    <h1 id="planet-title">MARS</h1>
+    <h1 id="planet-title"></h1>
     <dl id="facts"></dl>
   </section>
 
@@ -205,48 +273,16 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
 (() => {
   'use strict';
 
-  const BASE = 'https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P';
-  const TO_EARTH = `${BASE}/fc3ded42-e845-41f3-a830-5cab512d79cd.mp4`;
-  const TO_VENUS = `${BASE}/b30f64d9-1637-477a-83df-d0fc6461a422.mp4`;
-  const MERCURY = `${BASE}/d6fb8b6b-c15e-4aaa-9cf7-45bbb5e33372.jpg`;
-
-  const planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
-
-  const states = {
-    mars: {
-      name: 'Mars', next: 'Earth', number: '[03]', portal: TO_EARTH, background: 'mars-background',
-      facts: [
-        ['Distance:', 'About 228 million km (1.5 astronomical units).'],
-        ['Year:', 'One Martian year is equal to 687 Earth days.'],
-        ['Temperature:', 'Around -60 °C, dropping to -125 °C at the poles in winter.'],
-        ['Atmosphere:', 'Very thin, consisting of 95% carbon dioxide, with frequent dust storms.']
-      ]
-    },
-    earth: {
-      name: 'Earth', next: 'Venus', number: '[02]', portal: TO_VENUS, background: 'earth-background',
-      facts: [
-        ['Distance:', '149.6 million km from the Sun.'],
-        ['Year:', '365.25 Earth days.'],
-        ['Temperature:', 'Average surface temperature around 15 °C.'],
-        ['Atmosphere:', 'Mostly nitrogen and oxygen, supporting life and liquid water.']
-      ]
-    },
-    venus: {
-      name: 'Venus', next: 'Mercury', number: '[06]', image: MERCURY, background: 'venus-background',
-      facts: [
-        ['Distance:', '108.2 million km from the Sun.'],
-        ['Year:', '225 Earth days.'],
-        ['Temperature:', 'Around 465 °C — the hottest planet in the Solar System.'],
-        ['Atmosphere:', 'Extremely dense, mostly carbon dioxide, with clouds of sulfuric acid.']
-      ]
-    }
-  };
+  const scenes = TEMPLATE.scenes;
+  const DEFAULT_FOCUS = { x: 50, y: 50 };
+  const STILL_HOLD_MS = 900; // how long an image-only arrival lingers before committing
 
   // ---- Elements -----------------------------------------------------------
   const $ = (id) => document.getElementById(id);
   const experience = document.querySelector('.experience');
   const planetList = document.querySelector('.planet-list');
-  const backgrounds = document.querySelectorAll('.background');
+  const backgroundsEl = document.querySelector('.backgrounds');
+  const portalWrap = document.querySelector('.portal-wrap');
   const titleEl = $('planet-title');
   const factsEl = $('facts');
   const nextName = $('next-name');
@@ -267,7 +303,10 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
   const cursor = document.querySelector('.custom-cursor');
 
   // ---- State --------------------------------------------------------------
-  let current = 'mars';
+  let index = 0;
+  let zoomProgress = 0;
+  let transitionMedia = null;
+  let transitionScene = null;
   let rendered = false;
   let busy = false;
   let expansion = 0;
@@ -329,35 +368,76 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
 
   // ---- Render -------------------------------------------------------------
   function render() {
-    const state = states[current];
-    experience.dataset.planet = current;
-    titleEl.textContent = state.name.toUpperCase();
-    nextName.textContent = state.next;
-    nextNumber.textContent = state.number;
-    portal.setAttribute('aria-label', `Travel to ${state.next}`);
+    const scene = scenes[index];
+    const next = nextScene();
+    experience.dataset.planet = scene.id;
+    titleEl.textContent = scene.name.toUpperCase();
+    nextName.textContent = next ? next.name : '';
+    nextNumber.textContent = next ? next.label || '' : '';
+    portal.setAttribute('aria-label', next ? `Travel to ${next.name}` : '');
+    portalWrap.style.visibility = next ? '' : 'hidden';
 
-    factsEl.innerHTML = state.facts
+    factsEl.innerHTML = (scene.facts || [])
       .map(([k, v]) => `<div class="fact"><dt>${k}</dt><dd>${v}</dd></div>`)
       .join('');
 
-    planetList.innerHTML = planets
-      .map((p) => `<span class="planet-item${p === state.name ? ' active' : ''}">${p}</span>`)
+    planetList.innerHTML = TEMPLATE.menu
+      .map((p) => `<span class="planet-item${p === scene.name ? ' active' : ''}">${p}</span>`)
       .join('');
 
     if (rendered) retrigger(planetList, 'is-switching');
     rendered = true;
 
-    backgrounds.forEach((bg) => bg.classList.toggle('is-visible', bg.id === state.background));
+    backgroundsEl.querySelectorAll('.background')
+      .forEach((bg) => bg.classList.toggle('is-visible', bg.id === `${scene.id}-background`));
 
-    if (state.image) {
+    if (!next) {
       portalVideo.pause();
-    } else {
-      if (portalVideo.src !== state.portal) {
-        portalVideo.src = state.portal;
+    } else if (next.arrival) {
+      if (portalVideo.src !== next.arrival) {
+        portalVideo.src = next.arrival;
         portalVideo.load();
       }
       startPortalLoop();
+    } else {
+      portalVideo.pause();
+      if (portalImage.src !== next.image) portalImage.src = next.image;
+      portalImage.alt = next.name;
     }
+  }
+
+  function buildMedia() {
+    floatingLogo.src = TEMPLATE.logo.src;
+    floatingLogo.alt = TEMPLATE.logo.alt || '';
+    const first = scenes[0];
+    preloader.setAttribute('aria-label', `Loading ${first.name}`);
+    const f0 = focusOf(first);
+    preloaderVideo.style.objectPosition = `${f0.x}% ${f0.y}%`;
+    if (first.arrival) preloaderVideo.src = first.arrival;
+    scenes.forEach((scene) => {
+      if (!scene.background) return;
+      const v = document.createElement('video');
+      v.id = `${scene.id}-background`;
+      v.className = 'background';
+      v.muted = true; v.playsInline = true; v.preload = 'auto';
+      const f = focusOf(scene);
+      v.style.objectPosition = `${f.x}% ${f.y}%`;
+      v.src = scene.background;
+      backgroundsEl.appendChild(v);
+    });
+  }
+
+  // Draw a still into the held-scene canvas (used when a scene has no video).
+  function freezeStill(src, scene) {
+    const img = new Image();
+    img.onload = () => {
+      hasFrozenScene = false;
+      resizeCanvas();
+      sceneCtx.clearRect(0, 0, innerWidth, innerHeight);
+      drawCover(img, sceneCtx, focusOf(scene), scene.zoom ?? 1);
+      hasFrozenScene = true;
+    };
+    img.src = src;
   }
 
   function startPortalLoop() {
@@ -384,13 +464,25 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
     }
   }
 
-  function drawCover(media, c = ctx) {
+  // Cover-fit `media` to the viewport, cropping around `focus` (like CSS
+  // object-position) and optionally zooming in while keeping `focus` fixed.
+  function drawCover(media, c = ctx, focus = DEFAULT_FOCUS, zoom = 1) {
     const [mw, mh] = mediaSize(media);
     if (!mw || !mh) return;
+    const fx = focus.x / 100, fy = focus.y / 100;
     const scale = Math.max(innerWidth / mw, innerHeight / mh);
     const w = mw * scale, h = mh * scale;
-    try { c.drawImage(media, (innerWidth - w) / 2, (innerHeight - h) / 2, w, h); } catch (e) { /* not decodable yet */ }
+    const px = (innerWidth - w) * fx + w * fx;
+    const py = (innerHeight - h) * fy + h * fy;
+    const zw = w * zoom, zh = h * zoom;
+    try { c.drawImage(media, px - zw * fx, py - zh * fy, zw, zh); } catch (e) { /* not decodable yet */ }
   }
+
+  const sceneZoom = (scene) => 1 + ((scene.zoom ?? 1) - 1) * zoomProgress;
+  const focusOf = (scene) => (scene && scene.focus) || DEFAULT_FOCUS;
+  const nextScene = () => scenes[index + 1];
+  const canTravel = () => { const n = nextScene(); return !!n && !n.locked && !!(n.arrival || n.image); };
+  const previewMedia = (scene) => (scene.arrival ? portalVideo : portalImage);
 
   function drawShade(c = ctx) {
     const g = c.createLinearGradient(0, innerHeight * .52, 0, innerHeight);
@@ -455,7 +547,7 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
     const r = 90 * (1 - e) * scale;
     const rx = rotX * (1 - e), ry = rotY * (1 - e);
 
-    if (w > 1 && h > 1) {
+    if (w > 1 && h > 1 && (transitionActive || nextScene())) {
       const pts = roundedRectPoints(w, h, r).map((pt) => project(pt, cx, cy, rx, ry));
       ctx.save();
       ctx.globalAlpha = canvasOpacity;
@@ -465,8 +557,12 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
       ctx.clip();
       ctx.fillStyle = '#030303';
       ctx.fillRect(0, 0, innerWidth, innerHeight);
-      const state = states[current];
-      drawCover(transitionActive ? transitionVideo : (state.image ? portalImage : portalVideo));
+      if (transitionActive) {
+        drawCover(transitionMedia, ctx, focusOf(transitionScene), sceneZoom(transitionScene));
+      } else {
+        const next = nextScene();
+        drawCover(previewMedia(next), ctx, focusOf(next));
+      }
       if (transitionActive) drawShade();
       ctx.restore();
     }
@@ -519,13 +615,9 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
     retrigger(experience, 'content-revealing');
   }
 
-  function currentPortalMedia() {
-    const state = states[current];
-    return state.image ? portalImage : portalVideo;
-  }
-
   async function startExperience() {
-    await mediaReady(currentPortalMedia());
+    const next = nextScene();
+    if (next) await mediaReady(previewMedia(next));
     await revealMask();
     document.body.classList.add('intro-ready');
     await wait(850);
@@ -534,42 +626,56 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
 
   // ---- Travel -------------------------------------------------------------
   async function travel() {
-    if (busy || current === 'venus') return;
+    if (busy || !canTravel()) return;
     busy = true;
     targetX = 0; targetY = 0;
-    const next = current === 'mars' ? 'earth' : 'venus';
+    const next = nextScene();
+    const isVideo = !!next.arrival;
     try {
-      transitionVideo.src = states[current].portal;
-      transitionVideo.load();
-      experience.classList.add('is-loading');
-      await once(transitionVideo, ['canplaythrough', 'error'], 1600);
+      if (isVideo) {
+        transitionVideo.src = next.arrival;
+        transitionVideo.load();
+        experience.classList.add('is-loading');
+        await once(transitionVideo, ['canplaythrough', 'error'], 1600);
+      } else {
+        await mediaReady(portalImage);
+      }
 
       experience.classList.remove('is-loading', 'content-revealing', 'mask-revealing');
       experience.classList.add('is-transitioning');
-      transitionVideo.currentTime = 0;
-      transitionVideo.playbackRate = 1.3;
+      transitionMedia = isVideo ? transitionVideo : portalImage;
+      transitionScene = next;
+      zoomProgress = 0;
       canvasOpacity = 1;
       transitionActive = true;
-      const ended = once(transitionVideo, ['ended', 'error']);
-      await transitionVideo.play();
+      let ended = wait(STILL_HOLD_MS);
+      if (isVideo) {
+        transitionVideo.currentTime = 0;
+        transitionVideo.playbackRate = 1.3;
+        ended = once(transitionVideo, ['ended', 'error']);
+        await transitionVideo.play();
+      }
 
-      await animateValue((v) => { expansion = v; }, 1100);
+      // The window swallows the screen while pushing into the focus point.
+      await animateValue((v) => { expansion = v; zoomProgress = v; }, 1100);
       await ended;
 
       // Hold the final frame so the swap underneath is seamless.
       hasFrozenScene = false;
       resizeCanvas();
       sceneCtx.clearRect(0, 0, innerWidth, innerHeight);
-      drawCover(transitionVideo, sceneCtx);
+      drawCover(transitionMedia, sceneCtx, focusOf(next), sceneZoom(next));
       hasFrozenScene = true;
 
-      current = next;
+      index += 1;
       experience.classList.add('is-committing');
       render();
       await nextFrame();
       await nextFrame();
 
       transitionActive = false;
+      transitionMedia = null;
+      zoomProgress = 0;
       expansion = 0;
       maskScale = 0;
       canvasOpacity = 1;
@@ -585,6 +691,8 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
       busy = false;
     } catch (err) {
       transitionActive = false;
+      transitionMedia = null;
+      zoomProgress = 0;
       expansion = 0;
       maskScale = 1;
       canvasOpacity = 1;
@@ -631,17 +739,24 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
     if (p && p.catch) p.catch(finish);
   }
 
-  preloaderVideo.addEventListener('ended', finish);
-  preloaderVideo.addEventListener('error', finish);
-  if (preloaderVideo.readyState >= 1) startPreloader();
-  else preloaderVideo.addEventListener('loadedmetadata', startPreloader, { once: true });
-  // Safety net if the network never delivers metadata.
-  setTimeout(() => { if (!finished && preloaderVideo.readyState < 1) finish(); }, 12000);
-
   // ---- Boot ---------------------------------------------------------------
+  buildMedia();
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
   render();
+
+  if (scenes[0].arrival) {
+    preloaderVideo.addEventListener('ended', finish);
+    preloaderVideo.addEventListener('error', finish);
+    if (preloaderVideo.readyState >= 1) startPreloader();
+    else preloaderVideo.addEventListener('loadedmetadata', startPreloader, { once: true });
+    // Safety net if the network never delivers metadata.
+    setTimeout(() => { if (!finished && preloaderVideo.readyState < 1) finish(); }, 12000);
+  } else {
+    // No intro video: show the first scene's still and skip the countdown.
+    if (scenes[0].image) freezeStill(scenes[0].image, scenes[0]);
+    finish();
+  }
   requestAnimationFrame(frame);
 })();
 </script>
