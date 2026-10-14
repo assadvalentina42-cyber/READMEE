@@ -128,7 +128,8 @@ html,body,button,a,.portal{cursor:none!important}
 /* Content */
 .planet-content{left:clamp(28px,4vw,58px);right:clamp(28px,3vw,44px);bottom:clamp(24px,3vh,30px);
   display:flex;justify-content:space-between;align-items:flex-end;gap:40px;pointer-events:none}
-.planet-content h1{font-family:Aalto,'Arial Narrow',sans-serif;font-size:clamp(128px,21.8vw,314px);
+.planet-content h1{flex:0 1 auto;min-width:0;white-space:nowrap;
+  font-family:Aalto,'Arial Narrow',sans-serif;font-size:clamp(128px,21.8vw,314px);
   font-weight:400;line-height:.72;margin:0 0 -.04em;letter-spacing:0;transform:translateX(-32px);opacity:0}
 .planet-content dl{flex:none;width:min(447px,34vw);margin:0;font-size:16px}
 .fact{display:grid;grid-template-columns:138px 1fr;gap:18px;padding:8px 0;
@@ -372,6 +373,7 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
     const next = nextScene();
     experience.dataset.planet = scene.id;
     titleEl.textContent = scene.name.toUpperCase();
+    fitTitle();
     nextName.textContent = next ? next.name : '';
     nextNumber.textContent = next ? next.label || '' : '';
     portal.setAttribute('aria-label', next ? `Travel to ${next.name}` : '');
@@ -403,6 +405,21 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
       portalVideo.pause();
       if (portalImage.src !== next.image) portalImage.src = next.image;
       portalImage.alt = next.name;
+    }
+  }
+
+  // Shrink the title just enough to sit beside the facts column. The CSS size
+  // is tuned for the condensed Aalto face; wider fallbacks or long names would
+  // otherwise push the facts off-screen.
+  function fitTitle() {
+    titleEl.style.fontSize = '';
+    const content = titleEl.parentElement;
+    const gap = parseFloat(getComputedStyle(content).columnGap) || 0;
+    const available = content.clientWidth - factsEl.offsetWidth - gap;
+    const needed = titleEl.scrollWidth;
+    if (available > 0 && needed > available) {
+      const size = parseFloat(getComputedStyle(titleEl).fontSize);
+      titleEl.style.fontSize = `${Math.floor(size * available / needed)}px`;
     }
   }
 
@@ -741,7 +758,8 @@ body:not(.intro-ready) .header,body:not(.intro-ready) .planet-list,.planet-conte
 
   // ---- Boot ---------------------------------------------------------------
   buildMedia();
-  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('resize', () => { resizeCanvas(); fitTitle(); });
+  if (document.fonts) document.fonts.ready.then(fitTitle);
   resizeCanvas();
   render();
 
